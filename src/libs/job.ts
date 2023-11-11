@@ -37,15 +37,19 @@ export type JobOption = {
   };
 };
 
+export type JobOutput<TReturn extends Record<string, unknown>> = {
+  outputs: TReturn;
+};
+
 // eslint-disable-next-line
 export class Job<
   Inputs extends Record<string, unknown> = {},
   Outputs extends Record<string, unknown> = {},
   Steps extends Record<string, JobStepOutput<Inputs, Steps, Record<string, unknown>>> = {}
 > {
-  _inputs: Inputs = {} as Inputs;
-  _outputs: Outputs = {} as Outputs;
-  _steps: Steps = {} as Steps;
+  protected _inputs: Inputs = {} as Inputs;
+  protected _outputs: Outputs = {} as Outputs;
+  protected _steps: Steps = {} as Steps;
 
   constructor(protected option?: JobOption) {}
 
@@ -95,6 +99,6 @@ export class Job<
   }
 }
 
-export function createJob(jobOption?: JobOption){
+export function createJob(jobOption?: JobOption) {
   return new Job(jobOption);
 }

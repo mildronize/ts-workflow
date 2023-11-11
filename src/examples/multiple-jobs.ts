@@ -9,25 +9,22 @@ let workflow = createWorkflow({
 });
 
 workflow
-  .job({
-    name: 'job1',
-    job: w =>
-      w
-        .job()
+  .addJob('job1', {
+    job: job =>
+      job
+        .create()
         .inputs({ name: 'name' })
         .outputs(({ inputs }) => ({ name: inputs.name })),
   })
-  .job({
-    name: 'job2',
-    needs: w => w.needs('job1'),
-    job: w => w.job().inputs({ projectPath: '/name' }),
+  .addJob('job2', {
+    needs: job => job.needs('job1'),
+    job: job => job.create().inputs({ projectPath: '/name' }),
   })
-  .job({
-    name: 'job3',
-    needs: w => w.needs('job1', 'job2'),
-    job: w =>
-      w
-        .job()
+  .addJob('job3', {
+    needs: job => job.needs('job1', 'job2'),
+    job: job =>
+      job
+        .create()
         .inputs({ projectPath: '/name' })
         .step({
           name: 'step1',

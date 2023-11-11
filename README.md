@@ -5,17 +5,17 @@
 ## Usage
 
 ```ts
-import { Workflow } from '@ts-workflow/core';
+import { Job } from '@ts-workflow/core';
 // import { WorkflowGithubActions } from '@ts-workflow/github-actions'; TODO: Add Github Actions API
 
 async function main() {
-  const workflow = new Workflow({
+  const job = new Job({
     postRun: {
       order: 'asc',
     },
   });
 
-  const workflowOutput = await workflow
+  const JobOutput = await job
     .inputs({
       tenant: 'tenant',
     })
@@ -58,11 +58,7 @@ async function main() {
     })
     .execute();
 
-  console.log(workflowOutput);
-  // const workflowOutput: {
-  //     build: string;
-  //     deploy: string;
-  // }
+  console.log(JobOutput);
 }
 main();
 ```

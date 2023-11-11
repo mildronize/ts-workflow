@@ -1,13 +1,13 @@
-import { Workflow } from './libs';
+import { Job } from './libs';
 
 async function main() {
-  const workflow = new Workflow({
+  const job = new Job({
     postRun: {
       order: 'asc',
     },
   });
 
-  const workflowOutput = await workflow
+  const jobOutput = await job
     .inputs({
       tenant: 'tenant',
     })
@@ -50,6 +50,6 @@ async function main() {
     })
     .execute();
 
-  console.log(workflowOutput);
+  console.log(jobOutput);
 }
 main();

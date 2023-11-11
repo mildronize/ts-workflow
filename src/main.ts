@@ -27,11 +27,19 @@ async function main() {
     .step({
       name: 'build',
       run: ({ inputs, steps }) => {
-        // @ts-expect-error
-        const reuslt = steps.prepare.outputs.result;
+        const result = steps.prepare.outputs.result;
         console.log('build');
         const build = inputs.tenant + ' build';
         return { build };
+      },
+    })
+    .step({
+      name: 'deploy',
+      run: ({ inputs, steps }) => {
+        const result = steps.prepare.outputs.result;
+        console.log('deploy');
+        const deploy = result + ' deploy';
+        return { deploy };
       },
     })
     .execute();

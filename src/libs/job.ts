@@ -5,25 +5,20 @@ export type PromiseLike<T> = T | Promise<T>;
 export type PostRunParams = {
   status: 'success' | 'failed';
 };
+export type JobStepReturn = Record<string, unknown> | void ;
 
-export type JobStep<Inputs, TJobSteps, TReturn extends Record<string, unknown>> = (params: {
+export type JobStep<Inputs, TJobSteps, TReturn extends JobStepReturn> = (params: {
   inputs: Inputs;
   steps: TJobSteps;
 }) => PromiseLike<TReturn>;
 
-export type JobStepParams<
-  TName extends string,
-  TInputs,
-  TSteps,
-  TRunReturn extends Record<string, unknown>,
-  TPostRunReturn
-> = {
+export type JobStepParams<TName extends string, TInputs, TSteps, TRunReturn extends JobStepReturn, TPostRunReturn> = {
   name: TName;
   run: JobStep<TInputs, TSteps, TRunReturn>;
   postRun?: (params: PostRunParams) => TPostRunReturn;
 };
 
-export type JobStepOutput<Inputs, Steps, TReturn extends Record<string, unknown>> = {
+export type JobStepOutput<Inputs, Steps, TReturn extends JobStepReturn> = {
   outputs: TReturn;
   /**
    * Internal use only
@@ -37,7 +32,7 @@ export type JobOption = {
   };
 };
 
-export type JobOutput<TReturn extends Record<string, unknown>> = {
+export type JobOutput<TReturn extends JobStepReturn> = {
   outputs: TReturn;
 };
 
@@ -45,7 +40,7 @@ export type JobOutput<TReturn extends Record<string, unknown>> = {
 export class Job<
   Inputs extends Record<string, unknown> = {},
   Outputs extends Record<string, unknown> = {},
-  Steps extends Record<string, JobStepOutput<Inputs, Steps, Record<string, unknown>>> = {}
+  Steps extends Record<string, JobStepOutput<Inputs, Steps, JobStepReturn>> = {}
 > {
   protected _inputs: Inputs = {} as Inputs;
   protected _outputs: Outputs = {} as Outputs;
@@ -53,7 +48,7 @@ export class Job<
 
   constructor(protected option?: JobOption) {}
 
-  step<const TName extends string, TReturn extends Record<string, unknown>>({
+  step<const TName extends string, TReturn extends JobStepReturn>({
     name,
     run,
   }: JobStepParams<TName, Inputs, Steps, TReturn, unknown>) {
@@ -77,7 +72,7 @@ export class Job<
     return this as Job<Inputs & NewInput, Outputs, Steps>;
   }
 
-  outputs<TReturn extends Record<string, unknown>>(setOutput: JobStep<Inputs, Steps, TReturn>) {
+  outputs<TReturn extends JobStepReturn>(setOutput: JobStep<Inputs, Steps, TReturn>) {
     this._outputs = {
       ...(setOutput({
         inputs: this._inputs,

@@ -8,13 +8,11 @@ export class Workflow<WorkflowJobs extends Record<string, Job> = {}> {
   protected _jobs: WorkflowJobs = {} as WorkflowJobs;
 
   constructor(option?: WorkflowOption) {}
-  addJob<const TName extends string, const TNeed extends keyof WorkflowJobs | undefined>(
-    name: TName,
-    params: {
-      job: (w: WorkflowJobHelper<WorkflowJobs>) => WorkflowJobs[TName];
-      needs?: (w: WorkflowJobHelper<WorkflowJobs>) => TNeed[];
-    }
-  ) {
+  addJob<const TName extends string, const TNeed extends keyof WorkflowJobs | undefined>(params: {
+    name: TName;
+    job: (w: WorkflowJobHelper<WorkflowJobs>) => WorkflowJobs[TName];
+    needs?: (w: WorkflowJobHelper<WorkflowJobs>) => TNeed[];
+  }) {
     return this as Workflow<WorkflowJobs & { [K in TName]: Job }>;
   }
 }

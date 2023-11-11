@@ -1,13 +1,13 @@
-import { Job } from './libs';
+import { JobOption, createJob } from './libs';
+
+const jobOption: JobOption = {
+  postRun: {
+    order: 'asc',
+  },
+};
 
 async function main() {
-  const job = new Job({
-    postRun: {
-      order: 'asc',
-    },
-  });
-
-  const jobOutput = await job
+  const jobOutput = await createJob(jobOption)
     .inputs({
       tenant: 'tenant',
     })
@@ -46,7 +46,7 @@ async function main() {
       return {
         build: steps.build.outputs.build,
         deploy: steps.deploy.outputs.deploy,
-      }
+      };
     })
     .execute();
 

@@ -1,29 +1,29 @@
 // PoC Concept: https://github.com/thaitype/ts-Job/issues/1
 
-type PromiseLike<T> = T | Promise<T>;
+export type PromiseLike<T> = T | Promise<T>;
 
-type PostRunParams = {
+export type PostRunParams = {
   status: 'success' | 'failed';
 };
 
-type JobStep<Inputs, TJobSteps, TReturn extends Record<string, unknown>> = (params: {
+export type JobStep<Inputs, TJobSteps, TReturn extends Record<string, unknown>> = (params: {
   inputs: Inputs;
   steps: TJobSteps;
 }) => PromiseLike<TReturn>;
 
-type JobStepParams<
+export type JobStepParams<
   TName extends string,
-  Inputs,
+  TInputs,
   TSteps,
   TRunReturn extends Record<string, unknown>,
   TPostRunReturn
 > = {
   name: TName;
-  run: JobStep<Inputs, TSteps, TRunReturn>;
+  run: JobStep<TInputs, TSteps, TRunReturn>;
   postRun?: (params: PostRunParams) => TPostRunReturn;
 };
 
-type JobStepOutput<Inputs, Steps, TReturn extends Record<string, unknown>> = {
+export type JobStepOutput<Inputs, Steps, TReturn extends Record<string, unknown>> = {
   outputs: TReturn;
   /**
    * Internal use only
@@ -31,7 +31,7 @@ type JobStepOutput<Inputs, Steps, TReturn extends Record<string, unknown>> = {
   _steps: JobStep<Inputs, Steps, TReturn>;
 };
 
-type JobOption = {
+export type JobOption = {
   postRun?: {
     order: 'asc' | 'desc';
   };
@@ -93,4 +93,8 @@ export class Job<
     }
     return this._outputs;
   }
+}
+
+export function createJob(jobOption?: JobOption){
+  return new Job(jobOption);
 }

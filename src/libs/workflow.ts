@@ -25,13 +25,12 @@ type WorkflowStepParams<
   postRun?: (params: PostRunParams) => TPostRunReturn;
 };
 
-type Output2<Items, Inputs, Steps, TReturn extends Record<string, unknown>> = {
-  outputs: WorkflowStep<Items, Inputs, Steps, TReturn>;
-};
-
-type Output<Items, Inputs, Steps, TReturn extends Record<string, unknown>> = {
+type WorkflowStepOutput<Items, Inputs, Steps, TReturn extends Record<string, unknown>> = {
   outputs: TReturn;
-  _steps: WorkflowStep<Items, Inputs, Steps, TReturn>
+  /**
+   * Internal use only
+   */
+  _steps: WorkflowStep<Items, Inputs, Steps, TReturn>;
 };
 
 type WorkflowOption = {
@@ -44,10 +43,12 @@ type WorkflowOption = {
 export class Workflow<
   Items extends Record<string, unknown> = {},
   Inputs extends Record<string, unknown> = {},
-  Steps extends Record<string, Output<Items, Inputs, Steps, Record<string, unknown>>> = {}
+  Outputs extends Record<string, unknown> = {},
+  Steps extends Record<string, WorkflowStepOutput<Items, Inputs, Steps, Record<string, unknown>>> = {}
 > {
   _variables: Items = {} as Items;
   _inputs: Inputs = {} as Inputs;
+  _outputs: Outputs = {} as Outputs;
   _steps: Steps = {} as Steps;
 
   constructor(protected option?: WorkflowOption) {}
@@ -63,8 +64,9 @@ export class Workflow<
     return this as Workflow<
       Items,
       Inputs,
+      Outputs,
       Steps & {
-        [K in TName]: Output<Items, Inputs, Steps, TReturn>;
+        [K in TName]: WorkflowStepOutput<Items, Inputs, Steps, TReturn>;
       }
     >;
   }
@@ -73,22 +75,29 @@ export class Workflow<
     this._inputs = {
       ...(value as unknown as Inputs),
     };
-    return this as Workflow<Items, Inputs & NewInput>;
+    return this as Workflow<Items, Inputs & NewInput, Outputs, Steps>;
+  }
+
+  outputs<TReturn extends Record<string, unknown>>(setOutput: WorkflowStep<Items, Inputs, Steps, TReturn>) {
+    this._outputs = {
+      ...(setOutput({
+        var: this._variables,
+        inputs: this._inputs,
+        steps: this._steps,
+      }) as unknown as Outputs),
+    };
+    return this as Workflow<Items, Inputs, Outputs & TReturn, Steps>;
   }
 
   async execute() {
-    for (const [name, item] of Object.entries(this._steps)) {
-      console.log(`[workflow] step: ${name}`);
-      const result = await item._steps({
+    for (const [stepName, item] of Object.entries(this._steps)) {
+      console.log(`[workflow] step: ${stepName}`);
+      await item._steps({
         var: this._variables,
         inputs: this._inputs,
         steps: this._steps,
       });
-      this._variables = {
-        ...this._variables,
-        ...(result as unknown as Items),
-      };
     }
-    return this._variables;
+    return this._outputs;
   }
 }

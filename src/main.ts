@@ -13,7 +13,7 @@ async function main() {
     })
     .step({
       name: 'prepare',
-      run: async ({ inputs, steps }) => {
+      run: async ({ inputs }) => {
         console.log('prepare');
         const result = inputs.tenant + ' prepare';
         return { result };
@@ -35,12 +35,18 @@ async function main() {
     })
     .step({
       name: 'deploy',
-      run: ({ inputs, steps }) => {
+      run: ({ steps }) => {
         const result = steps.prepare.outputs.result;
         console.log('deploy');
         const deploy = result + ' deploy';
         return { deploy };
       },
+    })
+    .outputs(({ steps }) => {
+      return {
+        build: steps.build.outputs.build,
+        deploy: steps.deploy.outputs.deploy,
+      }
     })
     .execute();
 

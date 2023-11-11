@@ -6,31 +6,29 @@ type PostRunParams = {
   status: 'success' | 'failed';
 };
 
-type WorkflowStep<Items, Inputs, TWorkflowSteps, TReturn extends Record<string, unknown>> = (params: {
-  var: Items;
+type WorkflowStep<Inputs, TWorkflowSteps, TReturn extends Record<string, unknown>> = (params: {
   inputs: Inputs;
   steps: TWorkflowSteps;
 }) => PromiseLike<TReturn>;
 
 type WorkflowStepParams<
   TName extends string,
-  Items,
   Inputs,
   TSteps,
   TRunReturn extends Record<string, unknown>,
   TPostRunReturn
 > = {
   name: TName;
-  run: WorkflowStep<Items, Inputs, TSteps, TRunReturn>;
+  run: WorkflowStep<Inputs, TSteps, TRunReturn>;
   postRun?: (params: PostRunParams) => TPostRunReturn;
 };
 
-type WorkflowStepOutput<Items, Inputs, Steps, TReturn extends Record<string, unknown>> = {
+type WorkflowStepOutput<Inputs, Steps, TReturn extends Record<string, unknown>> = {
   outputs: TReturn;
   /**
    * Internal use only
    */
-  _steps: WorkflowStep<Items, Inputs, Steps, TReturn>;
+  _steps: WorkflowStep<Inputs, Steps, TReturn>;
 };
 
 type WorkflowOption = {
@@ -41,12 +39,10 @@ type WorkflowOption = {
 
 // eslint-disable-next-line
 export class Workflow<
-  Items extends Record<string, unknown> = {},
   Inputs extends Record<string, unknown> = {},
   Outputs extends Record<string, unknown> = {},
-  Steps extends Record<string, WorkflowStepOutput<Items, Inputs, Steps, Record<string, unknown>>> = {}
+  Steps extends Record<string, WorkflowStepOutput<Inputs, Steps, Record<string, unknown>>> = {}
 > {
-  _variables: Items = {} as Items;
   _inputs: Inputs = {} as Inputs;
   _outputs: Outputs = {} as Outputs;
   _steps: Steps = {} as Steps;
@@ -56,17 +52,16 @@ export class Workflow<
   step<const TName extends string, TReturn extends Record<string, unknown>>({
     name,
     run,
-  }: WorkflowStepParams<TName, Items, Inputs, Steps, TReturn, unknown>) {
+  }: WorkflowStepParams<TName, Inputs, Steps, TReturn, unknown>) {
     this._steps = {
       ...this._steps,
       [name]: run,
     };
     return this as Workflow<
-      Items,
       Inputs,
       Outputs,
       Steps & {
-        [K in TName]: WorkflowStepOutput<Items, Inputs, Steps, TReturn>;
+        [K in TName]: WorkflowStepOutput<Inputs, Steps, TReturn>;
       }
     >;
   }
@@ -75,25 +70,23 @@ export class Workflow<
     this._inputs = {
       ...(value as unknown as Inputs),
     };
-    return this as Workflow<Items, Inputs & NewInput, Outputs, Steps>;
+    return this as Workflow<Inputs & NewInput, Outputs, Steps>;
   }
 
-  outputs<TReturn extends Record<string, unknown>>(setOutput: WorkflowStep<Items, Inputs, Steps, TReturn>) {
+  outputs<TReturn extends Record<string, unknown>>(setOutput: WorkflowStep<Inputs, Steps, TReturn>) {
     this._outputs = {
       ...(setOutput({
-        var: this._variables,
         inputs: this._inputs,
         steps: this._steps,
       }) as unknown as Outputs),
     };
-    return this as Workflow<Items, Inputs, Outputs & TReturn, Steps>;
+    return this as Workflow<Inputs, Outputs & TReturn, Steps>;
   }
 
   async execute() {
     for (const [stepName, item] of Object.entries(this._steps)) {
       console.log(`[workflow] step: ${stepName}`);
       await item._steps({
-        var: this._variables,
         inputs: this._inputs,
         steps: this._steps,
       });

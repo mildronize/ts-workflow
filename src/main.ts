@@ -1,22 +1,21 @@
-import { Workflow } from "./libs";
+import { Workflow } from './libs';
 
 async function main() {
   const workflow = new Workflow({
     postRun: {
-      order: 'asc'
-    }
+      order: 'asc',
+    },
   });
 
   const workflowOutput = await workflow
-    .input({
-      env: 123,
+    .inputs({
       tenant: 'tenant',
     })
     .step({
       name: 'prepare',
-      run: async ({ env, tenant }) => {
+      run: async ({ inputs }) => {
         console.log('prepare');
-        const prepare = 'data';
+        const prepare = inputs.tenant + ' prepare';
         return { prepare };
       },
       postRun: ({ status }) => {
@@ -27,9 +26,9 @@ async function main() {
     })
     .step({
       name: 'build',
-      run: ({ prepare, env, tenant }) => {
+      run: ({ inputs }) => {
         console.log('build');
-        const build = prepare + ' build';
+        const build = inputs.tenant + ' build';
         return { build };
       },
     })

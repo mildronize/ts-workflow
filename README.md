@@ -5,6 +5,8 @@
 ## Expected Usage
 
 ```ts
+import { Workflow } from '@ts-workflow/core';
+import { WorkflowGithubActions } from '@ts-workflow/github-actions';
 
 const workflow = new Workflow({
   postRun: {

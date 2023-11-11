@@ -6,7 +6,7 @@ type PostRunParams = {
   status: 'success' | 'failed';
 };
 
-type WorkflowRun<Items, Inputs, Steps, TReturn extends Record<string, unknown>> = (params: {
+type WorkflowStep<Items, Inputs, Steps, TReturn extends Record<string, unknown>> = (params: {
   var: Items;
   inputs: Inputs;
   steps: Steps;
@@ -21,7 +21,7 @@ type WorkflowStepParams<
   TPostRunReturn
 > = {
   name: TName;
-  run: WorkflowRun<Items, Inputs, Steps, TRunReturn>;
+  run: WorkflowStep<Items, Inputs, Steps, TRunReturn>;
   postRun?: (params: PostRunParams) => TPostRunReturn;
 };
 
@@ -35,7 +35,7 @@ type WorkflowOption = {
 export class Workflow<
   Items extends Record<string, unknown> = {},
   Inputs extends Record<string, unknown> = {},
-  Steps extends Record<string, WorkflowRun<Items, Inputs, Steps, Record<string, unknown>>> = {}
+  Steps extends Record<string, WorkflowStep<Items, Inputs, Steps, Record<string, unknown>>> = {}
 > {
   _variables: Items = {} as Items;
   _inputs: Inputs = {} as Inputs;
@@ -52,7 +52,7 @@ export class Workflow<
       [name]: run,
     };
     return this as Workflow<Items, Inputs, Steps & {
-      [K in TName]: WorkflowRun<Items, Inputs, Steps, TReturn>;
+      [K in TName]: WorkflowStep<Items, Inputs, Steps, TReturn>;
     }>;
   }
 

@@ -1,4 +1,4 @@
-import { JobOption, createJob } from './libs';
+import { JobOption, createJob } from '../libs';
 
 const jobOption: JobOption = {
   postRun: {

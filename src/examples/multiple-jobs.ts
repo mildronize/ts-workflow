@@ -40,7 +40,7 @@ workflow
         .inputs({ projectPath: '/name' })
         .step({
           name: 'step1',
-          run: ({ steps }) => {
+          run: ({ steps, needs }) => {
             // @ts-expect-error
             const result = needs.job1.outputs.result;
           },

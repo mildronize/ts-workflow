@@ -19,7 +19,6 @@ workflow
   })
   .addJob({
     name: 'job2',
-    // needs: job => job.needs('job1'),
     job: job =>
       job.create().step({
         name: 'step1',
@@ -33,7 +32,6 @@ workflow
   })
   .addJob({
     name: 'job3',
-    // needs: job => job.needs('job1'),
     job: job =>
       job
         .create()
@@ -43,8 +41,8 @@ workflow
           name: 'step1',
           run: ({ steps, needs }) => {
 
-            const result = needs
-                  // ^?
+            // @ts-expect-error
+            const result = needs.job1.outputs.name;
 
           },
         }),

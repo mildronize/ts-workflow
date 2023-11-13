@@ -61,7 +61,11 @@ export class Job<
   /**
    * Needs satisfies the Record of `jobName` and `JobNeedsOutput`
    */
-  Needs extends Record<string, JobNeedsOutput<JobStepReturn>> = {}
+  Needs extends Record<string, JobNeedsOutput<JobStepReturn>> = {},
+  /**
+   * Selected Needs job depenedencies
+   */
+  NeedsOutput extends Record<string, JobNeedsOutput<JobStepReturn>> = {}
 > {
   protected _inputs: Inputs = {} as Inputs;
   protected _outputs: Outputs = {} as Outputs;
@@ -73,7 +77,7 @@ export class Job<
   step<const TName extends string, TReturn extends JobStepReturn>({
     name,
     run,
-  }: JobStepParams<TName, Inputs, Steps, TReturn, unknown, Needs>) {
+  }: JobStepParams<TName, Inputs, Steps, TReturn, unknown, NeedsOutput>) {
     this._steps = {
       ...this._steps,
       [name]: run,
@@ -85,7 +89,8 @@ export class Job<
       Steps & {
         [K in TName]: JobStepOutput<Inputs, Steps, TReturn, Needs>;
       },
-      Needs
+      Needs,
+      NeedsOutput
     >;
   }
 
@@ -93,11 +98,11 @@ export class Job<
     this._inputs = {
       ...(value as unknown as Inputs),
     };
-    return this as Job<Inputs & NewInput, Outputs, Steps, Needs>;
+    return this as Job<Inputs & NewInput, Outputs, Steps, Needs, NeedsOutput>;
   }
 
   needs<TNeed extends keyof Needs>(...args: TNeed[]) {
-    return this as Job<Inputs, Outputs, Steps, Needs>;
+    return this as Job<Inputs, Outputs, Steps, Needs, NeedsOutput & Record<TNeed, JobNeedsOutput<JobStepReturn>>>;
   }
 
   outputs<TReturn extends JobStepReturn>(setOutput: JobStep<Inputs, Steps, TReturn, Needs>) {
@@ -108,7 +113,7 @@ export class Job<
         needs: {} as Needs,
       }) as unknown as Outputs),
     };
-    return this as Job<Inputs, Outputs & TReturn, Steps, Needs>;
+    return this as Job<Inputs, Outputs & TReturn, Steps, Needs, NeedsOutput>;
   }
 
   async execute() {

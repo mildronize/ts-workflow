@@ -5,9 +5,9 @@ export type PromiseLike<T> = T | Promise<T>;
 export type PostRunParams = {
   status: 'success' | 'failed';
 };
-export type JobStepReturn = Record<string, unknown> | void;
+export type JobStepReturn<T extends Record<string, unknown>> = T | void;
 
-export type JobStep<Inputs, TJobSteps, TReturn extends JobStepReturn, Needs> = (params: {
+export type JobStep<Inputs, TJobSteps, TReturn extends JobStepReturn<Record<string,unknown>>, Needs> = (params: {
   inputs: Inputs;
   steps: TJobSteps;
   needs: Needs;
@@ -17,7 +17,7 @@ export type JobStepParams<
   TName extends string,
   TInputs,
   TSteps,
-  TRunReturn extends JobStepReturn,
+  TRunReturn extends JobStepReturn<Record<string,unknown>>,
   TPostRunReturn,
   Needs
 > = {
@@ -29,8 +29,8 @@ export type JobStepParams<
 export type JobStepOutput<
   Inputs,
   Steps,
-  TReturn extends JobStepReturn,
-  Needs extends Record<string, JobNeedsOutput<JobStepReturn>>
+  TReturn extends JobStepReturn<Record<string,unknown>>,
+  Needs extends Record<string, JobNeedsOutput<JobStepReturn<Record<string,unknown>>>>
 > = {
   outputs: TReturn;
   /**
@@ -45,11 +45,11 @@ export type JobOption = {
   };
 };
 
-export type JobOutput<TReturn extends JobStepReturn> = {
+export type JobOutput<TReturn extends JobStepReturn<Record<string,unknown>>> = {
   outputs: TReturn;
 };
 
-export type JobNeedsOutput<TReturn extends JobStepReturn> = {
+export type JobNeedsOutput<TReturn extends JobStepReturn<Record<string,unknown>>> = {
   outputs: TReturn;
 };
 
@@ -57,17 +57,17 @@ export type JobNeedsOutput<TReturn extends JobStepReturn> = {
 export class Job<
   Inputs extends Record<string, unknown> = {},
   Outputs extends Record<string, unknown> = {},
-  Steps extends Record<string, JobStepOutput<Inputs, Steps, JobStepReturn, Needs>> = {},
+  Steps extends Record<string, JobStepOutput<Inputs, Steps, JobStepReturn<Record<string,unknown>>, Needs>> = {},
   /**
    * All available needs that already registered in the workflow
-   * 
+   *
    * Needs satisfies the Record of `jobName` and `JobNeedsOutput`
    */
-  Needs extends Record<string, JobNeedsOutput<JobStepReturn>> = {},
+  Needs extends Record<string, JobNeedsOutput<JobStepReturn<Record<string,unknown>>>> = {},
   /**
    * Selected Needs job depenedencies
    */
-  NeedsOutput extends Record<string, JobNeedsOutput<JobStepReturn>> = {}
+  NeedsOutput extends Record<string, JobNeedsOutput<JobStepReturn<Record<string,unknown>>>> = {}
 > {
   protected _inputs: Inputs = {} as Inputs;
   protected _outputs: Outputs = {} as Outputs;
@@ -76,7 +76,7 @@ export class Job<
 
   constructor(protected option?: JobOption) {}
 
-  step<const TName extends string, TReturn extends JobStepReturn>({
+  step<const TName extends string, TReturn extends JobStepReturn<Record<string,unknown>>>({
     name,
     run,
   }: JobStepParams<TName, Inputs, Steps, TReturn, unknown, NeedsOutput>) {
@@ -104,10 +104,16 @@ export class Job<
   }
 
   needs<TNeed extends keyof Needs>(...args: TNeed[]) {
-    return this as Job<Inputs, Outputs, Steps, Needs, NeedsOutput & Record<TNeed, JobNeedsOutput<JobStepReturn>>>;
+    return this as Job<
+      Inputs,
+      Outputs,
+      Steps,
+      Needs,
+      NeedsOutput & Record<TNeed, JobNeedsOutput<Needs[TNeed]['outputs']>>
+    >;
   }
 
-  outputs<TReturn extends JobStepReturn>(setOutput: JobStep<Inputs, Steps, TReturn, Needs>) {
+  outputs<TReturn extends JobStepReturn<Record<string,unknown>>>(setOutput: JobStep<Inputs, Steps, TReturn, Needs>) {
     this._outputs = {
       ...(setOutput({
         inputs: this._inputs,
@@ -116,6 +122,10 @@ export class Job<
       }) as unknown as Outputs),
     };
     return this as Job<Inputs, Outputs & TReturn, Steps, Needs, NeedsOutput>;
+  }
+
+  getOutputs() {
+    return this._outputs;
   }
 
   async execute() {

@@ -7,10 +7,13 @@ export interface WorkflowOption {
 export interface AddJobParams<
   TName extends string,
   WorkflowJobs extends Record<string, Job>,
+  /**
+   * All available needs that already registered in the workflow
+   */
   Needs extends Record<string, JobNeedsOutput<JobStepReturn>> = {}
 > {
   name: TName;
-  job: (w: WorkflowJobHelper<WorkflowJobs, Needs>) => WorkflowJobs[TName];
+  job: (w: Job<{}, {}, {}, Needs>) => WorkflowJobs[TName];
 }
 
 export class Workflow<
@@ -38,18 +41,18 @@ export function createWorkflow(option?: WorkflowOption) {
   return new Workflow(option);
 }
 
-export class WorkflowJobHelper<
-  WorkflowJobs extends Record<string, Job> = {},
-  /**
-   * All available needs that already registered in the workflow
-   */
-  Needs extends Record<string, JobNeedsOutput<JobStepReturn>> = {}
-> {
-  constructor(protected option?: WorkflowOption) {}
+// export class WorkflowJobHelper<
+//   WorkflowJobs extends Record<string, Job> = {},
+//   /**
+//    * All available needs that already registered in the workflow
+//    */
+//   Needs extends Record<string, JobNeedsOutput<JobStepReturn>> = {}
+// > {
+//   constructor(protected option?: WorkflowOption) {}
 
-  protected _needs: Needs = {} as Needs;
+//   protected _needs: Needs = {} as Needs;
 
-  create() {
-    return new Job<{}, {}, {}, Needs>(this.option?.jobOptions);
-  }
-}
+//   create() {
+//     return new Job<{}, {}, {}, Needs>(this.option?.jobOptions);
+//   }
+// }

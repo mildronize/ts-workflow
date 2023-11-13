@@ -59,6 +59,8 @@ export class Job<
   Outputs extends Record<string, unknown> = {},
   Steps extends Record<string, JobStepOutput<Inputs, Steps, JobStepReturn, Needs>> = {},
   /**
+   * All available needs that already registered in the workflow
+   * 
    * Needs satisfies the Record of `jobName` and `JobNeedsOutput`
    */
   Needs extends Record<string, JobNeedsOutput<JobStepReturn>> = {},

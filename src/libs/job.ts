@@ -96,6 +96,10 @@ export class Job<
     return this as Job<Inputs & NewInput, Outputs, Steps, Needs>;
   }
 
+  needs<TNeed extends keyof Needs>(...args: TNeed[]) {
+    return this as Job<Inputs, Outputs, Steps, Needs>;
+  }
+
   outputs<TReturn extends JobStepReturn>(setOutput: JobStep<Inputs, Steps, TReturn, Needs>) {
     this._outputs = {
       ...(setOutput({

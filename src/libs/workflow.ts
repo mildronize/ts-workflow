@@ -30,7 +30,10 @@ export class Workflow<
 
   constructor(option?: WorkflowOption) {}
 
-  addJob<const TName extends string, const TNeed extends keyof WorkflowJobs, TOutputs extends JobStepReturn<Record<string, unknown>>>(
+  addJob<
+    const TName extends string
+    // TOutputs extends JobStepReturn<Record<string, unknown>>
+  >(
     // params: AddJobParams<
     //   TName,
     //   WorkflowJobs,
@@ -39,14 +42,9 @@ export class Workflow<
     // >
     params: {
       name: TName;
-      job: (
-        w: Job<
-          {},
-          {},
-          {},
-          Needs & Record<TNeed, JobNeedsOutput<TOutputs>>
-        >
-      ) => TOutputs;
+      job: <TOutputs extends Record<string, unknown>, const TNeed extends keyof WorkflowJobs>(
+        w: Job<{}, TOutputs, {}, Needs & Record<TNeed, JobNeedsOutput<TOutputs>>>
+      ) => Job<{}, TOutputs, {}, Needs & Record<TNeed, JobNeedsOutput<TOutputs>>>;
     }
 
     // params: AddJobParams<TName, WorkflowJobs, Needs & Record<TNeed, JobNeedsOutput<{

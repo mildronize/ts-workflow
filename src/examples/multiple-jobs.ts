@@ -11,7 +11,7 @@ let workflow = createWorkflow({
 workflow
   .addJob({
     name: 'job1',
-    job: job => job.inputs({ name: 'name' }).outputs(({ inputs }) => ({ name: inputs.name })).getOutputs(),
+    job: job => job.inputs({ name: 'name' }).outputs(({ inputs }) => ({ name: inputs.name })),
   })
   .addJob({
     name: 'job2',
@@ -24,7 +24,7 @@ workflow
             result: 'job2',
           };
         },
-      }).getOutputs(),
+      }),
   })
   .addJob({
     name: 'job3',
@@ -36,9 +36,9 @@ workflow
           name: 'step1',
           run: ({ steps, needs }) => {
             const result = needs.job1.outputs;
-                    // ^?
+            // ^?
           },
-        }).getOutputs(),
+        }),
   });
 
 type Needs = {
@@ -67,5 +67,4 @@ const out = job
   })
   .outputs(() => ({
     data: 'data',
-  }))
-  .getOutputs();
+  }));

@@ -1,22 +1,24 @@
 import { workflow } from '../main';
 import { z } from 'zod';
-
-import helloWorldJob from './hello-world';
-
+import helloWorld from './hello-world';
+const data = helloWorld;
 export default workflow
   .createJob('print')
-  .need(helloWorldJob)
+  .need({
+    helloWorld: import('./hello-world'),
+  })
   .input(
     z.object({
       name: z.string(),
     })
   )
-  .jobHandler(({ inputs, outputs, env, needs }) => {
-    // @ts-expect-error
-    const result = needs.helloWorld.outputs.title;
-    outputs.message = `Hello ${inputs.name}!`;
-    env.HELLO = 'WORLD';
-    return {
-      title: 'Hello World',
-    };
+  .jobHandler({
+    handler: ({ inputs, outputs, env, needs }) => {
+      console.log(needs.helloWorld.outputs.message);
+      console.log(inputs.name);
+      console.log(env.HELLO);
+      return {
+        title: 'Hello World',
+      };
+    },
   });

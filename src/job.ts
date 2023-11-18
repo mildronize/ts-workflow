@@ -1,3 +1,13 @@
+/**
+ * In order to design type-safe workflow, we need to make sure that:
+ * 1. Seperate one function for a single job
+ * 2. The job function should be able to access the outputs of other jobs
+ * 3. The job function should be able to receive the inputs of other jobs
+ * 4. The job function can process environment variables
+ */
+
+import { OrderedPipeline } from './ordered-pipeline';
+
 export type OutputReturn = Record<string, unknown> | void;
 export type MayPromise<T> = T | Promise<T>;
 
@@ -37,22 +47,9 @@ export class Job<
     return this as unknown as Job<Env, Outputs, TNeed>;
   }
 
-  handler<TOutput extends OutputReturn>(handler: (params: { env: Env; needs: Needs }) => MayPromise<TOutput>) {
+  handler<TOutput extends OutputReturn>(
+    handler: (params: { env: Env; needs: Needs; pipeline: OrderedPipeline }) => MayPromise<TOutput>
+  ) {
     return this as unknown as Job<Env, TOutput, Needs>;
   }
 }
-
-export class Workflow {
-  job(name?: string) {
-    return new Job(name);
-  }
-}
-
-/**
- * In order to design type-safe workflow, we need to make sure that:
- * 1. Seperate one function for a single job
- * 2. The job function should be able to access the outputs of other jobs
- * 3. The job function should be able to receive the inputs of other jobs
- * 4. The job function can process environment variables
- */
-export function jobWrapper() {}

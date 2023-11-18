@@ -2,6 +2,6 @@
  * Example of Implementation
  */
 
-import { Workflow } from '../job-wrapper';
+import { Workflow } from '../workflow';
 
 export const workflow = new Workflow();

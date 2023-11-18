@@ -11,7 +11,7 @@ export const print = workflow
   })
   .handler(async ({ env, needs }) => {
     console.log(needs.helloWorld.outputs.title);
-    console.log(needs.prepare.outputs.data);
+    console.log(needs.prepare.outputs.title);
     console.log(env.name);
     await new Promise(resolve => setTimeout(resolve, 1000));
   });

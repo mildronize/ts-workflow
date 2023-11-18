@@ -8,9 +8,27 @@ export const prepare = workflow
       name: z.string(),
     })
   )
-  .handler(({ env }) => {
-    console.log(env.name);
-    return {
-      data: 'Hello World',
-    };
-  });
+  .handler(({ env, pipeline }) =>
+    pipeline
+      .step({
+        id: 'test',
+        run: () => {
+          console.log('step 1');
+          return {
+            data: 'test',
+          };
+        },
+        postRun: ({ status }) => {
+          if (status === 'failed') console.log('step 1');
+        },
+      })
+      .step({
+        run: ({ steps }) => {
+          console.log(steps.test.outputs.data);
+          console.log('step 2');
+        },
+      })
+      .outputs(() => ({
+        title: 'Hello World',
+      }))
+  );

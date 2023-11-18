@@ -1,6 +1,5 @@
-
 export type OutputReturn = Record<string, unknown> | void;
-export type MayPromise<T> = T | Promise<T>; 
+export type MayPromise<T> = T | Promise<T>;
 
 export type AcceptedParser<T> =
   | ((input: unknown) => T)
@@ -13,11 +12,16 @@ export type JobNeedsOutput<TReturn extends OutputReturn> = {
 };
 
 export class Job<
-  Env extends Record<string, unknown>,
-  Outputs extends OutputReturn,
+  Env extends Record<string, unknown> = {},
+  Outputs extends OutputReturn = void,
   Needs extends Record<string, Job<any, any, any>> = {}
 > {
-  constructor() {
+  /**
+   * Flag to indicate whether this job is exported
+   */
+  public readonly isExported = true;
+
+  constructor(protected name?: string) {
     console.log('Job created');
   }
 
@@ -39,10 +43,9 @@ export class Job<
 }
 
 export class Workflow {
-  job() {
-    return new Job();
+  job(name?: string) {
+    return new Job(name);
   }
-
 }
 
 /**

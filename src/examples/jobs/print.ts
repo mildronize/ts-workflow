@@ -1,9 +1,8 @@
 import { workflow } from '../main';
-import { z } from 'zod';
-import helloWorld from './hello-world';
-import prepare from './prepare';
+import { helloWorld } from './hello-world';
+import { prepare } from './prepare';
 
-export default workflow
+export const print = workflow
   .job()
   .env<{ name: string }>()
   .needs({

@@ -1,7 +1,7 @@
 import { workflow } from '../main';
 import { z } from 'zod';
 
-export default workflow
+export const helloWorld = workflow
   .job()
   .env(
     z.object({

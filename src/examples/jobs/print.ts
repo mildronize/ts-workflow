@@ -5,11 +5,7 @@ import prepare from './prepare';
 
 export default workflow
   .job()
-  .env(
-    z.object({
-      name: z.string(),
-    })
-  )
+  .env<{ name: string }>()
   .needs({
     helloWorld,
     prepare,
@@ -18,5 +14,5 @@ export default workflow
     console.log(needs.helloWorld.outputs.title);
     console.log(needs.prepare.outputs.data);
     console.log(env.name);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
   });

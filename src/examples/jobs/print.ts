@@ -4,7 +4,7 @@ import helloWorld from './hello-world';
 import prepare from './prepare';
 
 export default workflow
-  .createJob()
+  .job()
   .env(
     z.object({
       name: z.string(),

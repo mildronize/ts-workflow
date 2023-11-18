@@ -46,7 +46,7 @@ export class Job<Env extends Record<string, unknown>, Outputs, Needs extends Rec
 // }
 
 export class Workflow {
-  createJob() {
+  job() {
     return new Job();
   }
 

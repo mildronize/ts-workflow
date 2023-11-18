@@ -2,7 +2,7 @@ import { workflow } from '../main';
 import { z } from 'zod';
 
 export default workflow
-  .createJob()
+  .job()
   .env(
     z.object({
       name: z.string(),

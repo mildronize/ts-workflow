@@ -4,6 +4,10 @@ export type MayPromise<T> = T | Promise<T>;
 
 export type PostRunParams = {
   status: 'success' | 'failed';
+  /**
+   * Previous step return value, it depends on the order of the step
+   */
+  previous: unknown;
 };
 export type JobStepReturn<T extends Record<string, unknown>> = T | void;
 

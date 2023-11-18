@@ -1,41 +1,56 @@
+// import { Job } from "src/libs/job";
+
 export type OutputReturn = Record<string, unknown>;
 
-export type JobHandler<TOutput extends OutputReturn> = (params: {
-  inputs: any;
-  outputs: TOutput;
-  env: any;
-  needs: unknown;
-}) => TOutput;
+// export type JobHandler<TInput, TOutput extends OutputReturn> = (params: {
+//   inputs: TInput;
+//   outputs: TOutput;
+//   env: any;
+//   needs: unknown;
+// }) => TOutput;
 
-export class Job<TOutput extends OutputReturn> {
+export type AcceptedParser<T> =
+  | ((input: unknown) => T)
+  | {
+      parse: (input: unknown) => T;
+    };
+
+export type JobNeedsOutput<TReturn extends OutputReturn> = {
+  outputs: TReturn;
+};
+
+export class Job<TInput, TOutput> {
   constructor() {
     console.log('Job created');
   }
+
+  get outputs() {
+    return {} as TOutput;
+  }
 }
 
+// export interface Job<TInput, TOutput>{
+//   outputs?: TOutput;
+// }
+
 export class Workflow {
-  createJob<TOutput extends OutputReturn>(name: string) {
-    return this;
-  }
-
-  input(inputSchema: any) {
-    return this;
-  }
-
-  need<TOutput extends OutputReturn>(job: Job<TOutput>) {
-    return this;
-  }
-
-  jobHandler<TOutput extends OutputReturn>(options: {
-    inputs?: any;
-    needs?: any;
-    handler: (params: { inputs: any; outputs: any; env: any; needs: any }) => TOutput;
-  }) {
-    return new Job<TOutput>();
-  }
-
-  jobHandler2<TOutput extends OutputReturn>(params: JobHandler<TOutput>) {
-    return new Job<TOutput>();
+  createJob<TName extends string, TInput, TOutput, TNeed extends Record<string, Job<string, OutputReturn>> = {}>(
+    name: TName,
+    options?: {
+      inputs?: AcceptedParser<TInput>;
+      // outputs?: AcceptedParser<TOutput>;
+      needs?: TNeed;
+      handler: (params: {
+        /**
+         * Handle the inputs
+         */
+        inputs: TInput;
+        env: any;
+        needs: TNeed;
+      }) => TOutput;
+    }
+  ) {
+    return new Job<TInput, TOutput>();
   }
 }
 

@@ -37,15 +37,11 @@ export class Workflow {
   createJob<TName extends string, TInput, TOutput, TNeed extends Record<string, Job<string, OutputReturn>> = {}>(
     name: TName,
     options?: {
-      inputs?: AcceptedParser<TInput>;
+      env?: AcceptedParser<TInput>;
       // outputs?: AcceptedParser<TOutput>;
       needs?: TNeed;
       handler: (params: {
-        /**
-         * Handle the inputs
-         */
-        inputs: TInput;
-        env: any;
+        env: TInput;
         needs: TNeed;
       }) => TOutput;
     }

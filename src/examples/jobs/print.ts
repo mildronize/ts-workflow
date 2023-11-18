@@ -14,11 +14,9 @@ export default workflow
     helloWorld,
     prepare,
   })
-  .handler(({ env, needs }) => {
+  .handler(async ({ env, needs }) => {
     console.log(needs.helloWorld.outputs.title);
     console.log(needs.prepare.outputs.data);
     console.log(env.name);
-    return {
-      title: 'Hello World',
-    };
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   });

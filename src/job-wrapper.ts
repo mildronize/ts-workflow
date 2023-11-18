@@ -2,8 +2,8 @@
 
 export type OutputReturn = Record<string, unknown>;
 
-// export type JobHandler<TInput, TOutput extends OutputReturn> = (params: {
-//   inputs: TInput;
+// export type JobHandler<TEnv, TOutput extends OutputReturn> = (params: {
+//   inputs: TEnv;
 //   outputs: TOutput;
 //   env: any;
 //   needs: unknown;
@@ -19,36 +19,51 @@ export type JobNeedsOutput<TReturn extends OutputReturn> = {
   outputs: TReturn;
 };
 
-export class Job<TInput, TOutput> {
+export class Job<Env extends Record<string, unknown>, Outputs, Needs extends Record<string, Job<any, any, any>> = {}> {
   constructor() {
     console.log('Job created');
   }
 
   get outputs() {
-    return {} as TOutput;
+    return {} as Outputs;
+  }
+
+  env<TEnv extends Record<string, unknown>>(parser?: AcceptedParser<TEnv>) {
+    return this as unknown as Job<TEnv, Outputs, Needs>;
+  }
+
+  needs<TNeed extends Record<string, Job<any, any, any>> = {}>(job: TNeed) {
+    return this as unknown as Job<Env, Outputs, TNeed>;
+  }
+
+  handler<TOutput>(handler: (params: { env: Env; needs: Needs }) => TOutput) {
+    return this as unknown as Job<Env, TOutput, Needs>;
   }
 }
 
-// export interface Job<TInput, TOutput>{
+// export interface Job<TEnv, TOutput>{
 //   outputs?: TOutput;
 // }
 
 export class Workflow {
-  
-  createJob<TName extends string, TInput, TOutput, TNeed extends Record<string, Job<string, OutputReturn>> = {}>(
-    name: TName,
-    options?: {
-      env?: AcceptedParser<TInput>;
-      // outputs?: AcceptedParser<TOutput>;
-      needs?: TNeed;
-      handler: (params: {
-        env: TInput;
-        needs: TNeed;
-      }) => TOutput;
-    }
-  ) {
-    return new Job<TInput, TOutput>();
+  createJob() {
+    return new Job();
   }
+
+  // createJob<TName extends string, TEnv, TOutput, TNeed extends Record<string, Job<string, OutputReturn>> = {}>(
+  //   name: TName,
+  //   options?: {
+  //     env?: AcceptedParser<TEnv>;
+  //     // outputs?: AcceptedParser<TOutput>;
+  //     needs?: TNeed;
+  //     handler: (params: {
+  //       env: TEnv;
+  //       needs: TNeed;
+  //     }) => TOutput;
+  //   }
+  // ) {
+  //   return new Job<TEnv, TOutput>();
+  // }
 }
 
 /**

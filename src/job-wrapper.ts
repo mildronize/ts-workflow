@@ -34,6 +34,7 @@ export class Job<TInput, TOutput> {
 // }
 
 export class Workflow {
+  
   createJob<TName extends string, TInput, TOutput, TNeed extends Record<string, Job<string, OutputReturn>> = {}>(
     name: TName,
     options?: {

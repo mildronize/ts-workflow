@@ -26,7 +26,15 @@ export class Workflow {
     return this;
   }
 
-  jobHandler<TOutput extends OutputReturn>(params: JobHandler<TOutput>) {
+  jobHandler<TOutput extends OutputReturn>(options: {
+    inputs?: any;
+    needs?: any;
+    handler: (params: { inputs: any; outputs: any; env: any; needs: any }) => TOutput;
+  }) {
+    return new Job<TOutput>();
+  }
+
+  jobHandler2<TOutput extends OutputReturn>(params: JobHandler<TOutput>) {
     return new Job<TOutput>();
   }
 }

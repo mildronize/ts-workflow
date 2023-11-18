@@ -1,7 +1,6 @@
 import { workflow } from '../main';
 import { z } from 'zod';
 
-
 export default workflow
   .createJob('helloWorld')
   .input(
@@ -9,11 +8,20 @@ export default workflow
       name: z.string(),
     })
   )
-  .jobHandler(({ inputs, outputs, env, needs }) => {
-    // @ts-expect-error
-    const result = needs.helloWorld.outputs.title;
-    outputs.message = `Hello ${inputs.name}!`;
-    env.HELLO = 'WORLD';
+  //   .jobHandler({
+  //     handler: ({ inputs, outputs, env, needs }) => {
+  //       console.log(needs.helloWorld.outputs.message);
+  //       console.log(inputs.name);
+  //       console.log(env.HELLO);
+  //       return {
+  //         title: 'Hello World',
+  //       };
+  //     },
+  //   });
+  .jobHandler2(({ inputs, outputs, env, needs }) => {
+    // console.log(needs.helloWorld.outputs.message);
+    console.log(inputs.name);
+    console.log(env.HELLO);
     return {
       title: 'Hello World',
     };

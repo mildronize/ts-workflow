@@ -6,7 +6,7 @@
  * 4. The job function can process environment variables
  */
 
-import { OrderedPipeline } from './ordered-pipeline';
+import { Pipeline } from './pipeline';
 
 export type OutputReturn = Record<string, unknown> | void;
 export type MayPromise<T> = T | Promise<T>;
@@ -48,7 +48,7 @@ export class Job<
   }
 
   handler<TOutput extends OutputReturn>(
-    handler: (params: { env: Env; needs: Needs; pipeline: OrderedPipeline }) => MayPromise<TOutput>
+    handler: (params: { env: Env; needs: Needs; pipeline: Pipeline }) => MayPromise<TOutput>
   ) {
     return this as unknown as Job<Env, TOutput, Needs>;
   }

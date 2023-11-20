@@ -54,7 +54,7 @@ export type JobNeedsOutput<TReturn extends JobStepReturn<Record<string, unknown>
 };
 
 // eslint-disable-next-line
-export class OrderedPipeline<
+export class Pipeline<
   Inputs extends Record<string, unknown> = {},
   Outputs extends Record<string, unknown> = {},
   Steps extends Record<string, JobStepOutput<Inputs, Steps, JobStepReturn<Record<string, unknown>>, Needs>> = {},
@@ -86,7 +86,7 @@ export class OrderedPipeline<
         [id]: run,
       };
     const data = {} as JobStepOutput<Inputs, Steps, TReturn, Needs>;
-    return this as OrderedPipeline<
+    return this as Pipeline<
       Inputs,
       Outputs,
       Steps & {
@@ -101,7 +101,7 @@ export class OrderedPipeline<
     this._inputs = {
       ...(value as unknown as Inputs),
     };
-    return this as OrderedPipeline<Inputs & NewInput, Outputs, Steps, Needs, NeedsOutput>;
+    return this as Pipeline<Inputs & NewInput, Outputs, Steps, Needs, NeedsOutput>;
   }
 
   outputs<TReturn extends JobStepReturn<Record<string, unknown>>>(setOutput: JobStep<Inputs, Steps, TReturn, Needs>) {
@@ -133,5 +133,5 @@ export class OrderedPipeline<
 }
 
 export function createJob(jobOption?: JobOption) {
-  return new OrderedPipeline(jobOption);
+  return new Pipeline(jobOption);
 }

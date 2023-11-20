@@ -1,7 +1,7 @@
-import { OrderedPipeline } from '../ordered-pipeline';
+import { Pipeline } from '../pipeline';
 
 function main() {
-  const pipeline = new OrderedPipeline({
+  const pipeline = new Pipeline({
     postRun: {
       order: 'asc',
     },
